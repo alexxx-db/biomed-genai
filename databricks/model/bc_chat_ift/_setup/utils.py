@@ -22,7 +22,7 @@ def get_current_cluster_id() -> str:
         
     See: https://docs.databricks.com/en/large-language-models/foundation-model-training/create-fine-tune-run.html#cluster-id
     """
-  return json.loads(dbutils.notebook.entry_point.getDbutils().notebook().getContext().safeToJson())['attributes']['clusterId']
+    return json.loads(dbutils.notebook.entry_point.getDbutils().notebook().getContext().safeToJson())['attributes']['clusterId']
 
 
 def get_latest_model_version(model_name: str) -> int:
