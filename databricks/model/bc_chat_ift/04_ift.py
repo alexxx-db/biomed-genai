@@ -35,11 +35,14 @@ from _setup.utils import get_latest_model_version, get_current_cluster_id
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Set parameters and names
+# MAGIC ## Configuration
+# MAGIC 
+# MAGIC ### Set parameters and names
+# MAGIC Configure catalog, database, model names, and endpoints for the fine-tuning process.
 
 # COMMAND ----------
 
-catalog = "yen"
+catalog = "biomed_genai"
 db = "syn_data_gen"
 
 train_table_name = f"{catalog}.{db}.train"
@@ -62,7 +65,7 @@ inference_table_name = model_endpoint_name
 #https://docs.databricks.com/en/large-language-models/foundation-model-training/create-fine-tune-run.html
 run = fm.create(
   model=base_model_name,
-  experiment_path="/Users/yen.low@databricks.com/Experiments/biomed_genai",
+  experiment_path="/Shared/biomed_genai/experiments",
   train_data_path=train_table_name,
   eval_data_path=test_table_name,
   data_prep_cluster_id = get_current_cluster_id(),

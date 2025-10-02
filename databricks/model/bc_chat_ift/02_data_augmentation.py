@@ -36,8 +36,19 @@ from _setup.utils import write_jsonl_by_line
 
 # COMMAND ----------
 
-seed_table_name: str = "yen.syn_data_gen.seed"
-evolved_table_name: str = "yen.syn_data_gen.evolved"
+# MAGIC %md
+# MAGIC ## Configuration
+# MAGIC 
+# MAGIC ### Parameters
+# MAGIC Set up parameters for data augmentation including:
+# MAGIC - Input and output table names
+# MAGIC - Model endpoints and generation settings 
+# MAGIC - File paths and processing options
+
+# COMMAND ----------
+
+seed_table_name: str = "biomed_genai.syn_data_gen.seed"
+evolved_table_name: str = "biomed_genai.syn_data_gen.evolved"
 
 # TODO: set up volume for these files
 outfile: str = 'data/evolved.jsonl'

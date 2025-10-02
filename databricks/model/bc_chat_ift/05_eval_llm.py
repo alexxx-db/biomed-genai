@@ -27,11 +27,14 @@ from _setup.params import *
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Set parameters and names
+# MAGIC ## Configuration
+# MAGIC 
+# MAGIC ### Parameters and Names
+# MAGIC Set up catalog, database, model names, and endpoints for evaluation.
 
 # COMMAND ----------
 
-catalog = "yen"
+catalog = "biomed_genai"
 db = "syn_data_gen"
 
 test_table_name = f"{catalog}.{db}.test"

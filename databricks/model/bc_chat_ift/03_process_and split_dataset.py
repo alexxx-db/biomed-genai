@@ -10,6 +10,7 @@
 # COMMAND ----------
 
 import pandas as pd
+import json
 from pyspark.sql.types import StringType
 from pyspark.sql.functions import lit, udf, split, size, col, coalesce, pandas_udf
 from typing import List, Dict
@@ -17,12 +18,20 @@ from _setup.params import *
 
 # COMMAND ----------
 
-seed_table_name = "yen.syn_data_gen.seed"
-evolved_table_name = "yen.syn_data_gen.evolved"
+# MAGIC %md
+# MAGIC ## Configuration
+# MAGIC 
+# MAGIC ### Table Names
+# MAGIC Define all input and output table names for data processing pipeline.
 
-data_table_name = "yen.syn_data_gen.data"
-train_table_name = "yen.syn_data_gen.train"
-test_table_name = "yen.syn_data_gen.test"
+# COMMAND ----------
+
+seed_table_name = "biomed_genai.syn_data_gen.seed"
+evolved_table_name = "biomed_genai.syn_data_gen.evolved"
+
+data_table_name = "biomed_genai.syn_data_gen.data"
+train_table_name = "biomed_genai.syn_data_gen.train"
+test_table_name = "biomed_genai.syn_data_gen.test"
 
 # COMMAND ----------
 
@@ -62,6 +71,18 @@ merged_df.count(), seed_df.count(), evolved_df.count()
 
 # MAGIC %md
 # MAGIC ## 2. Re-format context, Q&A into a `messages` json required of chat models
+
+# COMMAND ----------
+
+@udf(returnType=StringType())
+def make_chat_udf(context: str, question: str, answer: str) -> str:
+    """Create chat messages format required for fine-tuning."""
+    messages = [
+        {"role": "system", "content": f"Use the following context to answer the user's question: {context}"},
+        {"role": "user", "content": question},
+        {"role": "assistant", "content": answer}
+    ]
+    return json.dumps(messages)
 
 # COMMAND ----------
 

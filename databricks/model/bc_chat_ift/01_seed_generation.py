@@ -38,6 +38,17 @@ from _setup.utils import write_jsonl_by_line
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## Configuration
+# MAGIC 
+# MAGIC ### Parameters
+# MAGIC Set up parameters for seed data generation including:
+# MAGIC - Input data sources and filtering criteria
+# MAGIC - Model endpoints and generation settings
+# MAGIC - Output locations and file names
+
+# COMMAND ----------
+
 min_chunk_len: int = 50
 chunk_table: str = "biomed_genai.processed.articles_content"
 model_seed: str = 'databricks-meta-llama-3.1-405b-instruct'
@@ -45,7 +56,7 @@ temperature: float = 0.7
 max_retries: int = 2
 max_concurrency: int = 4
 
-seed_table_name: str = "yen.syn_data_gen.seed"
+seed_table_name: str = "biomed_genai.syn_data_gen.seed"
 outfile = "data/seed.jsonl"
 
 # COMMAND ----------
