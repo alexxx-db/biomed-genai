@@ -3,13 +3,13 @@
 # MAGIC
 # MAGIC # Breast Cancer Evaluation Dataset - Simple
 # MAGIC
-# MAGIC Approach to developing an Evalaution Set will vary by user preference and experience. Regardless of conventions used to build your evaluation set, you will need to conform to the expected format described in Databricks Documentation on [Evaluation Sets](https://docs.databricks.com/en/generative-ai/agent-evaluation/evaluation-set.html).
+# MAGIC Approach to developing an Evalaution Set will vary by user preference and experience. Regardless of conventions used to build your evaluation set, you will need to conform to the expected format...
 # MAGIC
-# MAGIC We'll use Dataclasses (from <a href="$../../../python/biomed_genai/agent/eval.py" target="_blank">eval.py</a>) + notebook approach to build our Evaluation Set, but realize that while this approach is explicit and helpful for learning, it will be more verbose than other approaches such as writing directly to a file in a text editor or built from an existing structured data source like a table. We'll again take a look at these dataclasses when we iterate our eval dataset.
+# MAGIC We'll use Dataclasses (from <a href="$../../../python/biomed_genai/agent/eval.py" target="_blank">eval.py</a>) + notebook approach to build our Evaluation Set, but realize that while this approa...
 # MAGIC
 # MAGIC ---
 # MAGIC
-# MAGIC The reason that we develop an evaluation dataset is so that we can us it with a model to run [mlflow.evaluate](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=mlflow%20evaluate#mlflow.evaluate).
+# MAGIC The reason that we develop an evaluation dataset is so that we can us it with a model to run [mlflow.evaluate](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=mlflow%20evaluate#ml...
 # MAGIC
 # MAGIC The evaluation process calculates metrics for two categories; Performance Metrics & Quality Metrics.
 # MAGIC
@@ -32,156 +32,121 @@
 # MAGIC | `request`    | groundedness | *Is the response a hallucination or grounded in context?* | |
 # MAGIC | `request`    | chunk_relevance | *Did the retriever find relevant chunks?* | Calculated only if model has a retriever component |
 # MAGIC | `request`, `expected_response` | correctness | *Overall, did the agent generate a correct response?* | |
-# MAGIC | `request`, `expected_response`,</br> `expected_retrieved_context` | document_recall | *How many of the known relevant documents did the retriever find?* | Calculated only if model has a retriever component |
+# MAGIC | `request`, `expected_response`,</br> `expected_retrieved_context` | document_recall | *How many of the known relevant documents did the retriever find?* | Calculated only if model has a r...
 # MAGIC
 # MAGIC Depending on which fields in our Evaluation Set are populated, different metrics are provided.
 # MAGIC
 # MAGIC ---
 # MAGIC
-# MAGIC This notebook will make use of some dataclasses based upon the [Evaluation Sets](https://docs.databricks.com/en/generative-ai/agent-evaluation/evaluation-set.html) schemas. Using that framework, we'll define 5 questions with the following characteristics:
+# MAGIC This notebook will make use of some dataclasses based upon the [Evaluation Sets](https://docs.databricks.com/en/generative-ai/agent-evaluation/evaluation-set.html) schemas. Using that framework, ...
 # MAGIC
 # MAGIC  * **Representative**: It should accurately reflect the range of requests the application will encounter in production.
 # MAGIC  * **Challenging**: It should include difficult and diverse cases to effectively test the full range of the application’s capabilities.
 # MAGIC  * **Continually updated**: It should be updated regularly to reflect how the application is used and the changing patterns of production traffic.
 # MAGIC
-# MAGIC  **NOTE**: While this agent application happens to have a single evaluation dataset, it is also viable to use multiple evaluation datasets which won't be explored in the `bc_eval_ds` agent application.
-
+# MAGIC  **NOTE**: While this agent application happens to have a single evaluation dataset, it is also viable to use multiple evaluation datasets which won't be explored in the `bc_eval_ds` agent.
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC # Retrieve Agent Configs
 # MAGIC
-# MAGIC Similar to how we maintained a shared configuration across notebooks in our 'pubmed' workflow, we will again use shared configurations across all of the notebooks for the agent application `bc_qa_chat`.
-
+# MAGIC Similar to how we maintained a shared configuration across notebooks in our 'pubmed' workflow, we will again use shared configurations across all of the notebooks for the agent application...
 # COMMAND ----------
-
 # MAGIC %run ./_setup/setup_bc_qa_chat $SHOW_GOVERNANCE=true $SHOW_AGENT_DEPLOY=false
-
 # COMMAND ----------
-
 from biomed_genai.agent.eval import EvalSet, EvalSetEntry, EvalSetRequest
 
 # The dataclass that we'll use to develop our evaluation dataset
 bc_eval = EvalSet()
-
 # COMMAND ----------
-
 # MAGIC %md 
 # MAGIC
 # MAGIC # Evaluation Question 1 - Current Advancements
 # MAGIC
-# MAGIC **Rationale**: This question assesses the model's ability to provide information on modern screening techniques like 3D mammography, MRI, and ultrasound, as well as emerging methods like liquid biopsy and AI-enhanced imaging. It reflects the ongoing efforts to improve early detection rates and reduce false positives/negatives.
-
+# MAGIC **Rationale**: This question assesses the model's ability to provide information on modern screening techniques like 3D mammography, MRI, and ultrasound, as well as emerging methods like liquid biopsies and AI-enhanced imaging.
 # COMMAND ----------
-
 query = """What are the current advancements in breast cancer screening technologies, and how do they improve early detection?"""
 
-response = """Current advancements in breast cancer screening technologies include 3D mammography (tomosynthesis), which provides clearer and more detailed images of breast tissue, and AI-enhanced imaging, which improves the accuracy of detecting abnormalities. These technologies improve early detection by reducing false positives and negatives, enabling earlier intervention, and potentially leading to better patient outcomes."""
+response = """Current advancements in breast cancer screening technologies include 3D mammography (tomosynthesis), which provides clearer and more detailed images of breast tissue, and AI-enhanced tools that assist radiologists in detecting abnormalities. MRI and ultrasound are increasingly used for high-risk patients, and liquid biopsies, though still experimental, show promise for non-invasive detection of cancerous cells. These advancements improve early detection rates and reduce false positives and negatives."""
 
 entry = EvalSetEntry(request_id="bc_1",
                      request=EvalSetRequest.from_query(query),
                      expected_response=response)
 bc_eval.set.append(entry)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC # Evaluation Question 2 - Genetic Mutations
 # MAGIC
-# MAGIC **Rationale**: Understanding genetic predispositions is crucial for breast cancer research. This question evaluates the model's capability to explain the impact of specific genetic mutations on breast cancer risk and discuss preventive strategies like prophylactic surgeries, lifestyle changes, and targeted therapies.
-# MAGIC
-# MAGIC
-
+# MAGIC **Rationale**: Understanding genetic predispositions is crucial for breast cancer research. This question evaluates the model's capability to explain the impact of specific genetic mutations on risk and preventive strategies.
 # COMMAND ----------
-
 query = """How do genetic mutations, such as BRCA1 and BRCA2, influence breast cancer risk, and what preventive measures are available for high-risk individuals?"""
 
-response = """Genetic mutations in BRCA1 and BRCA2 significantly increase breast cancer risk by impairing the genes' ability to repair DNA, leading to a higher likelihood of cancerous cell growth. For high-risk individuals, preventive measures include enhanced screening protocols, lifestyle modifications, chemoprevention with medications like tamoxifen, and risk-reducing surgeries such as prophylactic mastectomy or oophorectomy."""
+response = """Genetic mutations in BRCA1 and BRCA2 significantly increase breast cancer risk by impairing the genes' ability to repair DNA, leading to a higher likelihood of cancerous cell growth. Preventive measures for high-risk individuals include enhanced screening, such as earlier and more frequent mammograms and MRIs, prophylactic surgeries (mastectomy and oophorectomy), and chemoprevention with drugs like tamoxifen."""
 
 entry = EvalSetEntry(request_id="bc_2",
                      request=EvalSetRequest.from_query(query),
                      expected_response=response)
 bc_eval.set.append(entry)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC #Evaluation Question 3 - Targeted Therapies and Immunotherapies
 # MAGIC
-# MAGIC
-# MAGIC **Rationale**: This question focuses on assessing the model's knowledge of the latest treatments, such as PARP inhibitors, CDK4/6 inhibitors, and immune checkpoint inhibitors, comparing their efficacy, side effects, and application to traditional chemotherapy methods.
-
+# MAGIC **Rationale**: This question focuses on assessing the model's knowledge of the latest treatments, such as PARP inhibitors, CDK4/6 inhibitors, and immune checkpoint inhibitors, comparing them to traditional chemotherapy.
 # COMMAND ----------
-
 query = """What are the recent developments in targeted therapies and immunotherapies for breast cancer, and how do they compare to traditional chemotherapy?"""
 
-response = """Recent developments in targeted therapies for breast cancer include drugs like CDK4/6 inhibitors and HER2 inhibitors, which specifically target cancer cell growth pathways, and immunotherapies like checkpoint inhibitors, which enhance the immune system's ability to attack cancer cells. Compared to traditional chemotherapy, these therapies tend to have fewer side effects and can be more effective for certain subtypes of breast cancer, offering personalized treatment options that improve patient outcomes."""
+response = """Recent developments in targeted therapies for breast cancer include drugs like CDK4/6 inhibitors and HER2 inhibitors, which specifically target cancer cell growth pathways, and immunotherapies such as immune checkpoint inhibitors. These approaches generally offer more personalized treatment with fewer side effects compared to traditional chemotherapy, which targets all rapidly dividing cells."""
 
 entry = EvalSetEntry(request_id="bc_3",
                      request=EvalSetRequest.from_query(query),
                      expected_response=response)
 bc_eval.set.append(entry)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC #Evaluation Question 4 - Tumor Microenvironment
 # MAGIC
-# MAGIC **Rationale**: The tumor microenvironment plays a significant role in cancer development and treatment resistance. This question tests the model's understanding of the biological interactions within the tumor microenvironment and how they can be targeted to improve treatment outcomes.
-
+# MAGIC **Rationale**: The tumor microenvironment plays a significant role in cancer development and treatment resistance. This question tests the model's understanding of the biological interactions between tumor cells and their surroundings.
 # COMMAND ----------
-
 query = """How does the tumor microenvironment contribute to breast cancer progression, and what are the implications for treatment?"""
 
-response = """The tumor microenvironment in breast cancer, composed of immune cells, blood vessels, and extracellular matrix, supports tumor growth and metastasis by providing necessary signals and nutrients. Understanding this environment has led to treatments targeting these interactions, such as anti-angiogenic therapies and immune checkpoint inhibitors, which aim to disrupt the supportive network of the tumor."""
+response = """The tumor microenvironment in breast cancer, composed of immune cells, blood vessels, and extracellular matrix, supports tumor growth and metastasis by providing necessary signals and nutrients. It can also create barriers to effective treatment, making it a target for therapies aimed at disrupting these supportive interactions and overcoming drug resistance."""
 
 entry = EvalSetEntry(request_id="bc_4",
                      request=EvalSetRequest.from_query(query),
                      expected_response=response)
 bc_eval.set.append(entry)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC #Evaluation Question 5 - Psychosocial Impacts
 # MAGIC
-# MAGIC **Rationale**: Beyond the biological and clinical aspects, the psychological impact of breast cancer is a crucial area of research. This question evaluates the model's ability to address the emotional and social challenges faced by patients and suggests ways healthcare providers can offer comprehensive support.
-
+# MAGIC **Rationale**: Beyond the biological and clinical aspects, the psychological impact of breast cancer is a crucial area of research. This question evaluates the model's ability to address mental health concerns and holistic patient care.
 # COMMAND ----------
-
 query = """What are the psychosocial impacts of breast cancer diagnosis and treatment, and how can healthcare providers support patients' mental health throughout the process?"""
 
-response = """Breast cancer diagnosis and treatment can lead to significant psychosocial impacts, including anxiety, depression, body image issues, and a reduced quality of life, affecting both patients and their families. Healthcare providers can support patients' mental health by offering counseling services, facilitating support groups, and integrating psychosocial care into treatment plans to help patients cope with emotional challenges."""
+response = """Breast cancer diagnosis and treatment can lead to significant psychosocial impacts, including anxiety, depression, body image issues, and a reduced quality of life, affecting both patients and their families. Healthcare providers can support mental health by offering counseling, support groups, psychoeducation, and integrating psychosocial care into the overall treatment plan."""
 
 entry = EvalSetEntry(request_id="bc_5",
                      request=EvalSetRequest.from_query(query),
                      expected_response=response)
 bc_eval.set.append(entry)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC ## Write eval_ds to a delta table
 # MAGIC
-# MAGIC You are not required to persist your data as a delta table, but there is already built-in mlflow methods for creating a dataset from a delta table very simple so it is recommended for the UC benefits of accessibility, security, and governance.
+# MAGIC You are not required to persist your data as a delta table, but there is already built-in mlflow methods for creating a dataset from a delta table very simple so it is recommended for the following reasons:
 # MAGIC
 # MAGIC The method we will call is `create_or_replace_delta`. Which writes the questions above into a delta table using the same schema as defined in [Evaluation Sets](https://docs.databricks.com/en/generative-ai/agent-evaluation/evaluation-set.html).
 # MAGIC
 # MAGIC **TODO**: Change Create or Replace with Create or Merge which will keep cleaner CDC, smaller writes.
-
 # COMMAND ----------
-
 # MAGIC %sql
 # MAGIC SELECT * FROM biomed_genai.agents.bc_eval_ds
-
 # COMMAND ----------
-
 # We'll want to have a create or replace method that will have the following behavior:
 # An overwrite will clean up the delta version - the convention is that the eval dataset matches the 
 #
@@ -200,28 +165,22 @@ def create_or_replace_delta(self, uc_name:str, overwrite=False, release_version:
         self.spark.createDataFrame(self.as_df).write.format("delta").mode("overwrite").saveAsTable(uc_name)
     else:
         print(f'No Action, {uc_name} is not empty.')
-
 # COMMAND ----------
-
 # Display the local pandas datafame of eval_ds
 display(bc_eval.as_df)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC # Evaluation Traces to populate `retrieved_context` [OPTIONAL]
 # MAGIC
-# MAGIC Above we completed the part of the Evaluation Dataset that can be provided by domain experts. However, it is a bit more tedious for domain experts to write the desired retrieved context. Thus, we can use the following to interactively pull set that retrieved_context we may want to add above.
+# MAGIC Above we completed the part of the Evaluation Dataset that can be provided by domain experts. However, it is a bit more tedious for domain experts to write the desired retrieved context. The...
 # MAGIC
 # MAGIC **NOTE**: This will not yield any results if this is your first iteration.
 # MAGIC
 # MAGIC **NOTE**: If you see more than one result, that is likely because multiple models versions or multiple dataset versions exist.
 # MAGIC
 # MAGIC **TODO**: Update eval dataclasses to include retrieved_context and provide an example above.
-
 # COMMAND ----------
-
 INTERACTIVE_TRACE = True
 
 if INTERACTIVE_TRACE:
@@ -236,27 +195,23 @@ if INTERACTIVE_TRACE:
     client.search_traces(experiment_ids = experiment_ids,
                          filter_string = filter_string)
     
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC # Validate Evaluation Dataset [OPTIONAL]
 # MAGIC
-# MAGIC It can be usefule to make sure that your evaluation dataset works, but we don't want to necessarily have to have a candidate model to do so. In this case, we'll simply evaluate our dataset and persist in this notebook experiment.
+# MAGIC It can be usefule to make sure that your evaluation dataset works, but we don't want to necessarily have to have a candidate model to do so. In this case, we'll simply evaluate our dataset u...
 # MAGIC
-# MAGIC **NOTE**: We don't want to save this mlflow experiemnt to our agent experiment because we don't consider this a candidate model. This experiemnt run is only to be able to inspect and validate our Evaluation Dataset is performing as desired.
+# MAGIC **NOTE**: We don't want to save this mlflow experiemnt to our agent experiment because we don't consider this a candidate model. This experiemnt run is only to be able to inspect and validate...
 # MAGIC
 # MAGIC ---
 # MAGIC
 # MAGIC ## Create a foundation model *function* to test evaluation set
 # MAGIC
-# MAGIC Since evaluation sets are really ever used with models, we'll create our first model evaluation with a simple chat foundation model with no retriver. We are then able to pass this pyfunc model as the model for evalution. 
+# MAGIC Since evaluation sets are really ever used with models, we'll create our first model evaluation with a simple chat foundation model with no retriver. We are then able to pass this pyfunc to mlflow.evaluate.
 # MAGIC
-# MAGIC **Note**: We are only going to create a wrapper function for `dbrx` to run eval. `dbrx` is pre-existing, we are adding no additional functionality so therefore we will not be logging a model in this notebook.
-
+# MAGIC **Note**: We are only going to create a wrapper function for `dbrx` to run eval. `dbrx` is pre-existing, we are adding no additional functionality so therefore we will not be logging a model.
 # COMMAND ----------
-
 VALIDATE_EVALUATION_DATASET = True
 
 if VALIDATE_EVALUATION_DATASET:
@@ -276,9 +231,7 @@ if VALIDATE_EVALUATION_DATASET:
                                "content": question}]}
 
     dbrx_predict(input_example)
-
 # COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC ## Run an evaluation on a Foundation Model Function [OPTIONAL]
@@ -288,9 +241,7 @@ if VALIDATE_EVALUATION_DATASET:
 # MAGIC To inspect the results, use the experiments icon on the right hand side (looks like a beaker).
 # MAGIC
 # MAGIC **NOTE**: This isn't a proper validation on `retrieved_context` since that field requires retriever and there isn't one in our function. 
-
 # COMMAND ----------
-
 from typing import Callable
 from mlflow.models.evaluation.base import EvaluationResult
 

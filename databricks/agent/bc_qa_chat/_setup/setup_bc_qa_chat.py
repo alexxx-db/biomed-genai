@@ -69,7 +69,6 @@ displayHTML(html_configs)
 
 bc_qa_chat
 
-
 # COMMAND ----------
 
 # DBTITLE 1,Conditional Display of Visualizations
@@ -108,5 +107,3 @@ if (dbutils.widgets.getArgument("SHOW_AGENT_DEPLOY") == 'true') or (dbutils.widg
             pass
 
 # COMMAND ----------
-
-
