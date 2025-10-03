@@ -1,4 +1,8 @@
-CREATE TABLE IF NOT EXISTS {uc_name} (
+SET catalog_name = 'biomed_genai_alex_barreto';
+SET schema_name  = 'processed';
+SET table_name   = 'articles_content';
+
+CREATE TABLE IF NOT EXISTS biomed_genai_alex_barreto.processed.articles_content (
     id        STRING NOT NULL,
     pmid      STRING,
     journal   STRING,

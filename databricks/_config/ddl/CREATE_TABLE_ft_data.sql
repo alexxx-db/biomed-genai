@@ -1,8 +1,8 @@
 SET catalog_name = 'biomed_genai_alex_barreto';
 SET schema_name  = 'syn_data_gen';
-SET table_name   = 'seed';
+SET table_name   = 'data';
 
-CREATE TABLE IF NOT EXISTS biomed_genai_alex_barreto.syn_data_gen.seed (
+CREATE TABLE IF NOT EXISTS biomed_genai_alex_barreto.syn_data_gen.data (
     id        STRING NOT NULL,
     pmid      STRING,
     journal   STRING,

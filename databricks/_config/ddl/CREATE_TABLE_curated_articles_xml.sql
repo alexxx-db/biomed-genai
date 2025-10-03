@@ -1,4 +1,8 @@
-CREATE TABLE IF NOT EXISTS {uc_name} (
+SET catalog_name = 'biomed_genai_alex_barreto';
+SET schema_name  = 'curated';
+SET table_name   = 'articles_xml';
+
+CREATE TABLE IF NOT EXISTS biomed_genai_alex_barreto.curated.articles_xml (
   AccessionID          STRING,
   ETag                 STRING,
   LastUpdated          TIMESTAMP,
