@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC This notebook is fifth in a series that generates synthetic data for subsequent chat completion Fine Tuning (FT). This notebook **compares the finetune model with the base model as answering LLMs alone (without a retriever).**
+# MAGIC This notebook is fifth in a series that generates synthetic data for subsequent chat completion Fine Tuning (FT). This notebook **compares the finetune model with the base model as answering agent**.
 # MAGIC
 # MAGIC What this notebook does:
 # MAGIC 1. Perform prediction on the test set from NB 3 using the base model and finetuned model from NB 4
@@ -27,14 +27,11 @@ from _setup.params import *
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Configuration
-# MAGIC 
-# MAGIC ### Parameters and Names
-# MAGIC Set up catalog, database, model names, and endpoints for evaluation.
+# MAGIC #### Set parameters and names
 
 # COMMAND ----------
 
-catalog = "biomed_genai"
+catalog = "yen"
 db = "syn_data_gen"
 
 test_table_name = f"{catalog}.{db}.test"
@@ -119,8 +116,3 @@ with mlflow.start_run(run_name=f"eval_{model_endpoint_name}") as run:
         evaluators="default",
         evaluator_config={'col_mapping': {'inputs': 'question'}}
     )
-
-
-# COMMAND ----------
-
-

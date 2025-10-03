@@ -117,4 +117,3 @@ displayHTML(html_configs)
 #             #del agent_deploy_graphic
 #         except:
 #             pass
-

@@ -5,7 +5,6 @@
 # MAGIC
 # MAGIC Brad to create the config class for all entities
 # MAGIC
-# MAGIC
 
 # COMMAND ----------
 
