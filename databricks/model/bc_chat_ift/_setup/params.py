@@ -9,7 +9,7 @@ import mlflow
 
 mlflow.set_registry_uri("databricks-uc")
 
-DATABRICKS_TOKEN: str = os.environ.get('DATABRICKS_TOKEN', dbutils.secrets.get("yen_hls_azure", "token"))
+DATABRICKS_TOKEN: str = os.environ.get('DATABRICKS_TOKEN', dbutils.secrets.get("biogen_genai", "token"))
 DATABRICKS_HOST: str = os.environ.get('DATABRICKS_HOST', f"https://{json.loads(dbutils.notebook.entry_point.getDbutils().notebook().getContext().toJson())['tags']['browserHostName']}")
 BASE_URL: str = f"{DATABRICKS_HOST}serving-endpoints"
 
