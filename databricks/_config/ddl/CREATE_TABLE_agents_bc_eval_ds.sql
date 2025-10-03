@@ -1,4 +1,8 @@
-CREATE TABLE IF NOT EXISTS {uc_name} (
+SET catalog_name = 'biomed_genai_alex_barreto';
+SET schema_name  = 'agents';
+SET table_name = 'bc_eval_ds';
+
+CREATE TABLE IF NOT EXISTS biomed_genai_alex_barreto.agents.bc_eval_ds (
   request_id                  STRING NOT NULL,
   request                     STRING NOT NULL,
   expected_retrieved_context  STRING,
